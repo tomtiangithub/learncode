@@ -1,0 +1,145 @@
+<refresh-view id='refreshView' backgroundColor="#000" bind:onRefresh="onPullDownRefresh"   bind:onPullState="_pullState" />
+ 
+<websocket host="{{websockethost}}" receive="{{socketReceive}}" appendgroups="{{socketgroup}}" port="{{websocketport}}"></websocket> 
+<view class="page"   bindtouchstart='handletouchstart' bindtouchmove='handletouchmove'  bindtouchend='handletouchend' bindtouchcancel='handletouchcancel'>
+  <swiper class="swiper_view" indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}">
+    <block wx:for="{{bannerlist}}" wx:for-item="banneritem"  wx:key="bannerid">
+      <swiper-item>
+        <view class="swiper-item {{banneritem.bannerid}}" style="background-image:url({{banneritem.bannerpicture}})" data-bannerdata="{{banneritem}}" bindtap='bannertap'></view>
+      </swiper-item>
+    </block>
+  </swiper>
+  <view class="view_jgarea">
+    <view class="view_jgareaplan">
+      <view class="view_operationlist">
+        <view class="view_operationitem" bindtap='opencategory'  >
+          <view class="icon tyq"></view>
+          <view class="text">体验区</view>
+        </view>
+        <view class="view_operationitem" bindtap='opendrying'>
+          <view class="icon sd"></view>
+          <view class="text">晒单</view>
+        </view>
+        <view class="view_operationitem"  bindtap='opensj'>
+          <view class="icon hyyj"></view>
+          <view class="text">会员赏金</view>
+        </view>
+        <view class="view_operationitem" bindtap='opennovicetutorial'>
+          <view class="icon xszn"></view>
+          <view class="text">新手指南</view>
+        </view>
+      </view>
+      <view class="view_boundplan">
+        <view class="redline"></view>
+        <view class="title">最新成交</view>
+        <view class="view_roll">
+          <textanimation class="textanimation_textclass" datalist="{{stepdata}}"></textanimation>
+        </view>
+        <view class="line"></view>
+        <view class="more" bindtap='openresultlist'>更多</view>
+      </view>
+    </view>
+    <view class="mp_auction" wx:if="{{mplist.length>0}}" bindtap="openmplist">
+      <view class="title">-限时秒拍-</view>
+      <view class="body">
+          <view class="left"  >
+            <view class="mplefttitle {{mplist[0].auctionstatus}}">
+              <block wx:if="{{mplist[0].auctionstatus!='placardsing'}}">即将抢购</block>
+              <block wx:else>已开拍</block>
+            </view>
+            <view class="mptime ">
+              <view class="left">{{mplist[0].auctionstarthour}}点场</view>
+              <view class="right " wx:if="{{mplist[0].auctionstatus=='nobegin'}}">等待开拍</view>
+              <view class="right component_countdown" wx:else><countdown countdown="{{countdown0}}"></countdown></view>
+            </view>
+            <view class="goodicon" style="background-image:url({{mplist[0].goodpicture}})"></view>
+          </view>
+          <view class="right">
+            <view class="top"> 
+              <view class="left">
+                <block wx:if="{{mplist[1]!=undefined}}">
+                  <view class="mptitle nobegin">{{mplist[1].auctionstarthour}}点场</view>
+                  <view class="mptime " wx:if="{{mplist[1].auctionstatus=='nobegin'}}">即将抢购</view>
+                  <view class="mptime " wx:else><countdown countdown="{{countdown1}}"></countdown></view> 
+                </block>
+                <block wx:else>
+                  <view class="none">暂无抢购</view>
+                </block>
+              </view>
+              <view class="right" >
+                <block wx:if="{{mplist[1]!=undefined}}">
+                  <view class="goodicon" style="background-image:url({{mplist[1].goodpicture}})"></view>
+                </block>
+                <block wx:else>
+                  <view class="goodicon none"  ></view>
+                </block>
+              </view>
+            </view>
+            <view class="bottom">
+              <view class="left">
+                <block wx:if="{{mplist[2]!=undefined}}">
+                  <view class="mptitle nobegin">{{mplist[2].auctionstarthour}}点场</view>
+                  <view class="mptime " wx:if="{{mplist[2].auctionstatus=='nobegin'}}">即将抢购</view>
+                  <view class="mptime " wx:else><countdown countdown="{{countdown2}}"></countdown></view> 
+                </block>
+                <block wx:else>
+                  <view class="none">暂无抢购</view>
+                </block>
+                
+              </view>
+              <view class="right "  >
+                <block wx:if="{{mplist[2]!=undefined}}">
+                  <view class="goodicon" style="background-image:url({{mplist[2].goodpicture}})"></view>
+                </block>
+                <block wx:else>
+                  <view class="goodicon none"  ></view>
+                </block>
+              </view>
+            </view>
+          </view>
+      </view>
+    </view>
+    <view class="auctionplan">
+      <view class="tab">
+        <view class="tabitem {{runing}}" catchtap='tabtap' data-tabid="runing">
+          <view class="text">正在竞拍</view>
+        </view>
+        <view class="tabitem {{waitrun}}" catchtap='tabtap' data-tabid="waitrun"> 
+          <view class="text">即将成团</view>
+        </view>
+        <view class="tabitem {{runed}}" catchtap='tabtap' data-tabid="runed">
+          <view class="text">最新成交</view>
+        </view>
+      </view>
+      <view class="auctionlist"  >
+        <block wx:for="{{cfauctionlist}}" wx:for-item="dataitem" wx:key="auctionid">
+          <auctionitem   data-auctionid="{{dataitem.auctionid}}"   data-defineid="{{dataitem.defineid}}" wx:if="{{countdownlist[dataitem.auctionid]!==undefined}}" countdownstring="{{countdownlist[dataitem.auctionid]}}" data="{{dataitem}}" type="{{dataitem.auctionstatus}}" bindshowdetail="opendetail" bindparticipation="participation"></auctionitem>
+          <auctionitem   data-auctionid="{{dataitem.auctionid}}"   data-defineid="{{dataitem.defineid}}" wx:else data="{{dataitem}}" type="{{dataitem.auctionstatus}}" bindshowdetail="opendetail" bindparticipation="participation"></auctionitem>
+         </block>
+      </view>
+    </view>
+  </view>
+ 
+   
+</view> 
+<participation show="{{participationshow}}" bindhide="participationhide" defineid="{{defineid}} " scorlltop="{{scorlltop}}">
+</participation> 
+
+
+<view class="loginreward {{loginrewardshow}}" catchtap='false' catchtouchmove='false'>
+  <view class="loginrewardmark" ></view>
+  <view class="loginrewardplan" catchtap='hideloginreward'>
+    <view class="loginrewardbody" catchtap='true'>
+      <view class="loginrewardtitle">{{loginrewardtitle}}</view>
+      <view class="loginrewardvalue">{{loginrewardvalue}}</view>
+      <view class="loginrewardcurrency">{{loginrewardcurrencyname}}</view>
+
+      <view class="receiveloginrewardbtn">
+      <view class="btnreceive" catchtap='receiveloginreward' data-currencytype="{{loginrewardcurrency}}" data-value="{{loginrewardvalue}}">领取奖励</view>
+      </view>
+    </view>
+    
+  </view>
+  
+  
+</view>
